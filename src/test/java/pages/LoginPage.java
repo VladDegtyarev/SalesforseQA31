@@ -3,8 +3,10 @@ package pages;
 import io.qameta.allure.Step;
 import lombok.extern.log4j.Log4j2;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.testng.Assert;
 
 @Log4j2
 public class LoginPage extends BasePage {
@@ -17,17 +19,29 @@ public class LoginPage extends BasePage {
     }
 
     @Step("Открытие страницы Login Page")
-    public void open() {
+    public LoginPage open () {
         driver.get(BASE_URL);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(LOGIN_BUTTON));
         log.info("Opening Login Page");
+        return this ;
+    }
+
+    @Override
+    public LoginPage isPageOpen() {
+        try {
+            wait.until(ExpectedConditions.visibilityOfElementLocated(LOGIN_BUTTON));
+        } catch (TimeoutException e) {
+            log.error(e.getMessage());
+            Assert.fail("Page isn't opened");
+        }
+        return this;
     }
 
     @Step("Вход в в аккаунт")
-    public void login() {
-        driver.findElement(USERNAME_INPUT).sendKeys("tborodich@tms.sandbox");
-        driver.findElement(PASSWORD_INPUT).sendKeys("Password003!");
+    public MainPage login(String mail,String password) {
+        log.info("Log in with cred {}, {}",mail,password);
+        driver.findElement(USERNAME_INPUT).sendKeys(mail);
+        driver.findElement(PASSWORD_INPUT).sendKeys(password);
         driver.findElement(LOGIN_BUTTON).click();
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".uiImage")));
+        return new MainPage(driver);
     }
 }

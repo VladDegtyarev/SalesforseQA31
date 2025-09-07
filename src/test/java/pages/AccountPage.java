@@ -9,6 +9,11 @@ public class AccountPage extends BasePage {
         super(driver);
     }
 
+    @Override
+    public AccountPage isPageOpen() {
+        return null;
+    }
+
     public void checkAccount(String name, String phone) {
         SoftAssert softAssert = new SoftAssert();
         softAssert.assertEquals(driver.findElement
